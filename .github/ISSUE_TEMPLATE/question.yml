@@ -1,0 +1,45 @@
+name: Question
+description: Ask a question about the template
+title: "[QUESTION] "
+labels: ["question"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Getting started
+        - API routes
+        - Zod validation
+        - Prisma or database
+        - Docker setup
+        - TypeScript
+        - Deployment
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like to know?
+      placeholder: Ask your question here.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What have you tried or what are you trying to build?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have checked the README
+          required: true
+        - label: I have searched existing issues
+          required: true

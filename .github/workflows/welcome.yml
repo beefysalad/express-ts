@@ -1,0 +1,56 @@
+name: Welcome Contributors
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet issue and pull request authors
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isIssue = Boolean(context.payload.issue);
+            const isPullRequest = Boolean(context.payload.pull_request);
+
+            if (!isIssue && !isPullRequest) {
+              return;
+            }
+
+            const author = isIssue
+              ? context.payload.issue.user.login
+              : context.payload.pull_request.user.login;
+
+            const number = isIssue
+              ? context.payload.issue.number
+              : context.payload.pull_request.number;
+
+            const body = isIssue
+              ? `Hi @${author}, thanks for opening this issue.
+
+            Please make sure it includes enough context for someone to act on it quickly:
+            - What happened or what you want to change
+            - Steps to reproduce, if this is a bug
+            - Relevant logs, examples, or environment details`
+              : `Hi @${author}, thanks for opening this pull request.
+
+            Before review, please make sure:
+            - The code follows the route/controller/service/repository structure
+            - Request input is validated with Zod
+            - No new \`any\` types were added
+            - \`npm run build\` passes`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: number,
+              body,
+            });
