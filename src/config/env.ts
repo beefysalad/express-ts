@@ -15,6 +15,7 @@ const envSchema = z.object({
   API_PREFIX: z.string().default("/api"),
   LOG_LEVEL: z.string().default("info"),
   CORS_ORIGIN: z.string().default("*"),
+  DATABASE_URL: z.url(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -30,4 +31,5 @@ export const env = {
   apiPrefix: parsedEnv.data.API_PREFIX,
   logLevel: parsedEnv.data.LOG_LEVEL,
   corsOrigin: parsedEnv.data.CORS_ORIGIN,
+  databaseUrl: parsedEnv.data.DATABASE_URL,
 };
