@@ -1,32 +1,33 @@
 import dotenv from "dotenv";
+import { z } from "zod";
 
 dotenv.config({ quiet: true });
 dotenv.config({ path: ".env.local", override: true, quiet: true });
 
-type Env = {
-  nodeEnv: string;
-  port: number;
-  host: string;
-  apiPrefix: string;
-  logLevel: string;
-  corsOrigin: string;
-};
+const envSchema = z.object({
+  NODE_ENV: z.string().default("development"),
+  PORT: z
+    .string()
+    .default("4000")
+    .transform((value) => Number(value))
+    .pipe(z.number().int().positive().max(65535)),
+  HOST: z.string().default("localhost"),
+  API_PREFIX: z.string().default("/api"),
+  LOG_LEVEL: z.string().default("info"),
+  CORS_ORIGIN: z.string().default("*"),
+});
 
-const parsePort = (value: string | undefined): number => {
-  const port = Number(value ?? 4000);
+const parsedEnv = envSchema.safeParse(process.env);
 
-  if (!Number.isInteger(port) || port <= 0 || port > 65535) {
-    throw new Error("PORT must be an integer between 1 and 65535");
-  }
+if (!parsedEnv.success) {
+  throw new Error(`Invalid environment variables: ${z.prettifyError(parsedEnv.error)}`);
+}
 
-  return port;
-};
-
-export const env: Env = {
-  nodeEnv: process.env.NODE_ENV ?? "development",
-  port: parsePort(process.env.PORT),
-  host: process.env.HOST ?? "localhost",
-  apiPrefix: process.env.API_PREFIX ?? "/api",
-  logLevel: process.env.LOG_LEVEL ?? "info",
-  corsOrigin: process.env.CORS_ORIGIN ?? "*",
+export const env = {
+  nodeEnv: parsedEnv.data.NODE_ENV,
+  port: parsedEnv.data.PORT,
+  host: parsedEnv.data.HOST,
+  apiPrefix: parsedEnv.data.API_PREFIX,
+  logLevel: parsedEnv.data.LOG_LEVEL,
+  corsOrigin: parsedEnv.data.CORS_ORIGIN,
 };
