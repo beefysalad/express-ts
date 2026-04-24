@@ -37,3 +37,5 @@ pids/
 .npm/
 .yarn/
 .pnpm-store/
+
+/src/generated/prisma
